@@ -6,6 +6,15 @@ public class Cart extends inventory{
     ArrayList<product> usercart = new ArrayList<>();
     Scanner s = new Scanner(System.in);
     int totalAmount;
+
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
     public void addincart(){
 //        showinventory();
         char ch;
@@ -16,10 +25,16 @@ public class Cart extends inventory{
                 product p = find(str);
                 if (p != null) {
                     System.out.println("enter the add quantity : ");
-                    int quan = s.nextInt();
-                    product p1 = new product(p.getProductName(), p.getProductId(), p.getCategory(), quan,p.getPrice());
+                    String integer = s.next();
+                    int number=0;
+                    try {
+                        number = Integer.parseInt(integer);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid format for integer");
+                    }
+                    product p1 = new product(p.getProductName(), p.getProductId(), p.getCategory(), number,p.getPrice());
                     usercart.add(p1);
-                    updateValues(str, 'a', quan);
+                    updateValues(str, 'a', number);
                 }
                 else{
                     System.out.println("sorry the item you want to buy not inside the inventory");
@@ -46,7 +61,13 @@ public class Cart extends inventory{
                 product p = findfromcart(str);
                 if (p != null) {
                     System.out.println("enter quantity");
-                    int quan = s.nextInt();
+                    String integer = s.next();
+                    int quan=0;
+                    try {
+                        quan = Integer.parseInt(integer);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid format for integer");
+                    }
                     updateValues(str, 'r', quan);
                     p.setProductQuantity(p.getProductQuantity() - quan);
                 } else {
@@ -71,34 +92,57 @@ public class Cart extends inventory{
         }
         return null;
     }
-    public void getTotalAmount(){
+    public void totalAmount(){
         if(usercart.isEmpty()){
             System.out.println("Cart is empty");
-            System.out.println("total amount is : "+totalAmount);
+            System.out.println("total premium amount is : "+totalAmount);
         }
         else {
             for (product p : usercart) {
                 totalAmount += p.getPrice() * p.getProductQuantity();
             }
+            setTotalAmount(totalAmount);
             System.out.println("Total amount is : "+totalAmount);
         }
 
     }
+    private void payBill(){
+        int total = getTotalAmount();
+        if(total == 0){
+            System.out.println("No balance");
+            usercart.clear();
+            return;
+        }
+        System.out.println("your total pending bill is : "+total);
+        System.out.println("Enter the amount you want to pay : ");
+        String val = s.next();
+        int number=0;
+        try {
+            number = Integer.parseInt(val);
+//            System.out.println("Parsed Integer: " + number);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid format for integer");
+        }
+        int remainingBalance  = total-number;
+
+        if(remainingBalance==0){
+            System.out.println("Bill paid completed...");
+            usercart.clear();
+        }
+        else{
+            System.out.println("the remaining amount is : "+remainingBalance);
+        }
+        setTotalAmount(remainingBalance);
+    }
     public void display(){
         if(usercart.isEmpty()){
             System.out.println("cart is empty");
-//            System.out.println("the total amount is : "+this.totalAmount);
         }
         else {
-//            int total = 0;
             for (product p : usercart) {
-//                this.totalAmount += p.getPrice() * p.getProductQuantity();
                 System.out.println(" product name : " + p.getProductName() + " product id : " + p.getProductId() + " quantity : " + p.getProductQuantity() + " price :" + p.getPrice());
             }
-//            System.out.println("Total price for the selected items is : ");
-//            System.out.print(this.totalAmount);
             System.out.println();
-//            setTotalAmount(total);
         }
     }
 
@@ -126,6 +170,7 @@ public class Cart extends inventory{
                 System.out.println("3 for displaying items inside the cart");
                 System.out.println("4 for displaying items inside the inventory");
                 System.out.println("5 for displaying total amount of the cart");
+                System.out.println("6 for paying the bill of the cart");
                 System.out.println("Enter any number that matches the indexing : ");
                 int ch = s.nextInt();
                 switch (ch) {
@@ -142,7 +187,11 @@ public class Cart extends inventory{
                         c.showinventory();
                         break;
                     case 5:
-                        c.getTotalAmount();
+                        c.totalAmount();
+                        break;
+                    case 6:
+                        c.totalAmount();
+                        c.payBill();
                         break;
                     default:
                         System.out.println("please press from the given numbers");
@@ -152,7 +201,7 @@ public class Cart extends inventory{
             } finally {
                 s.nextLine();
             }
-            System.out.println("you want to continue press y");
+            System.out.println("you want to continue press y and press n for exit");
             str=s.next().charAt(0);
         }while(str=='y'||str=='Y');
         s.close();
