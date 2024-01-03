@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Cart extends inventory{
     ArrayList<product> usercart = new ArrayList<>();
     Scanner s = new Scanner(System.in);
-    int totalAmount;
+    private int totalAmount;
 
     public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;
@@ -93,16 +93,18 @@ public class Cart extends inventory{
         return null;
     }
     public void totalAmount(){
+        int amount=0;
         if(usercart.isEmpty()){
             System.out.println("Cart is empty");
-            System.out.println("total premium amount is : "+totalAmount);
+            setTotalAmount(0);
+            System.out.println("total premium amount is : "+getTotalAmount());
         }
         else {
             for (product p : usercart) {
-                totalAmount += p.getPrice() * p.getProductQuantity();
+                amount += p.getPrice() * p.getProductQuantity();
             }
-            setTotalAmount(totalAmount);
-            System.out.println("Total amount is : "+totalAmount);
+            setTotalAmount(amount);
+            System.out.println("Total amount is : "+getTotalAmount());
         }
 
     }
@@ -127,12 +129,21 @@ public class Cart extends inventory{
 
         if(remainingBalance==0){
             System.out.println("Bill paid completed...");
+            for(product p : usercart){
+                updateCart(p.getProductName());
+            }
             usercart.clear();
         }
         else{
             System.out.println("the remaining amount is : "+remainingBalance);
         }
         setTotalAmount(remainingBalance);
+    }
+    public void updateCart(String name){
+        product p = findfromcart(name);
+        if(p!=null){
+            updateValues(name,'r',p.getProductQuantity());
+        }
     }
     public void display(){
         if(usercart.isEmpty()){
